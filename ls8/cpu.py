@@ -69,7 +69,13 @@ class CPU:
         while running:
             command = self.ram_read(self.pc)
 
-            self.pc += 1
+            if self.pc >= len(self.ram) - 1:
+                self.pc = 0
+            else:
+                self.pc += 1
 
     def ram_read(self, pc):
-        return self.ram[self.pc]
+        return self.ram[pc]
+
+    def ram_wrirte(self, pc, instruction):
+        self.ram[pc] = instruction
