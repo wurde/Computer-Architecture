@@ -9,6 +9,11 @@ class CPU:
         """Construct a new CPU."""
         self.pc = 0
         self.ram = [None] * 256
+        self.instruction = {
+            "LDI": 0b10000010,
+            "PRN": 0b01000111,
+            "HLT": 0b00000001
+        }
 
     def load(self):
         """Load a program into memory."""
@@ -68,6 +73,16 @@ class CPU:
 
         while running:
             command = self.ram_read(self.pc)
+
+            if command is not None:
+                print(f"{self.pc} {command}")
+
+            if command == self.instruction['LDI']:
+                pass
+            elif command == self.instruction['PRN']:
+                pass
+            elif command == self.instruction['HLT']:
+                running = False
 
             if self.pc >= len(self.ram) - 1:
                 self.pc = 0
