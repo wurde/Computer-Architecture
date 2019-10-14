@@ -9,6 +9,10 @@ class CPU:
         """Construct a new CPU."""
         self.pc = 0
         self.ram = [None] * 256
+        self.reg = [None] * 8
+        self.reg[5] = "IM"
+        self.reg[6] = 'IS'
+        self.reg[7] = 'SP'
         self.instruction = {
             "LDI": 0b10000010,
             "PRN": 0b01000111,
@@ -33,7 +37,6 @@ class CPU:
         ]
 
         for instruction in program:
-            print(f"{address} {instruction}")
             self.ram[address] = instruction
             address += 1
 
@@ -74,15 +77,18 @@ class CPU:
         while running:
             command = self.ram_read(self.pc)
 
-            if command is not None:
-                print(f"{self.pc} {command}")
+            # if command is not None:
+            #     print(f"{self.pc} {command}")
 
-            if command == self.instruction['LDI']:
-                pass
+            if command == self.instruction['LDI']:                
+                self.reg[self.pc + 1] = self.reg[self.pc + 2]
             elif command == self.instruction['PRN']:
-                pass
+                print(self.reg[self.pc + 1])
             elif command == self.instruction['HLT']:
                 running = False
+            else:
+                print(f"Unknown instruction: {command}")
+                sys.exit(1)
 
             if self.pc >= len(self.ram) - 1:
                 self.pc = 0
