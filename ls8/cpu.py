@@ -17,10 +17,11 @@ class CPU:
         self.reg[6] = 0 # IS
         self.reg[7] = 0 # SP
         self.instruction = {
-            "LDI": 0b10000010,
-            "PRN": 0b01000111,
-            "MUL": 0b10100010,
+            "NOP": 0b00000000,
             "HLT": 0b00000001,
+            "PRN": 0b01000111,
+            "LDI": 0b10000010,
+            "MUL": 0b10100010,
         }
 
     def load(self, filename):
@@ -87,7 +88,9 @@ class CPU:
         while running:
             command = self.ram_read(self.pc)
 
-            if command == self.instruction['LDI']:
+            if command == self.instruction['NOP']:
+                next
+            elif command == self.instruction['LDI']:
                 self.reg[self.ram_read(self.pc + 1)] = self.ram_read(self.pc + 2)
                 self.pc += 2
             elif command == self.instruction['PRN']:
