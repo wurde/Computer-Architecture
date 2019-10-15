@@ -71,7 +71,7 @@ As little as possible to get a particular LS-8 program running.
 Add features incrementally. Once `print8.ls8` is working, then add a `MULT`
 instruction to get `mult.ls8` running. And so on.
 
-Of course, you're _allowed_ to implement as many instructions are you'd like.
+Of course, you're _allowed_ to implement as many instructions as you'd like.
 
 This goes for individual components like registers, as well. Do you need to
 implement the `FL` register? If you want to use any functionality that depends
