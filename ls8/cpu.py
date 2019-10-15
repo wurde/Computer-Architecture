@@ -19,7 +19,8 @@ class CPU:
         self.instruction = {
             "LDI": 0b10000010,
             "PRN": 0b01000111,
-            "HLT": 0b00000001
+            "MUL": 0b10100010,
+            "HLT": 0b00000001,
         }
 
     def load(self, filename):
@@ -91,6 +92,10 @@ class CPU:
                 self.pc += 2
             elif command == self.instruction['PRN']:
                 print(self.ram[self.reg[self.ram[self.pc + 1]]])
+                self.pc += 1
+            elif command == self.instruction['MUL']:
+                # print(self.ram[self.reg[self.ram[self.pc + 1]]])
+                print(f"MUL")
                 self.pc += 1
             elif command == self.instruction['HLT']:
                 running = False
