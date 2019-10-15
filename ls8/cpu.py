@@ -39,7 +39,7 @@ class CPU:
                 # Convert any numbers from binary strings to integers
                 num = comment_split[0].strip()
                 try:
-                    val = int(num)
+                    val = int(num, 2)
                 except ValueError:
                     continue
 
