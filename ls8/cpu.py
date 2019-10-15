@@ -13,9 +13,9 @@ class CPU:
         self.reg = [0] * 8
 
         self.pc = 0        
-        self.reg[5] = "IM"
-        self.reg[6] = "IS"
-        self.reg[7] = "SP"
+        self.reg[5] = 0 # IM
+        self.reg[6] = 0 # IS
+        self.reg[7] = 0 # SP
         self.instruction = {
             "LDI": 0b10000010,
             "PRN": 0b01000111,
@@ -88,15 +88,16 @@ class CPU:
             command = self.ram_read(self.pc)
 
             if command == self.instruction['LDI']:
-                self.reg[self.ram[self.pc + 1]] = self.pc + 2
+                self.reg[self.ram_read(self.pc + 1)] = self.ram_read(self.pc + 2)
                 self.pc += 2
             elif command == self.instruction['PRN']:
-                print(self.ram[self.reg[self.ram[self.pc + 1]]])
+                print(self.reg[self.ram_read(self.pc + 1)])
                 self.pc += 1
             elif command == self.instruction['MUL']:
-                # print(self.ram[self.reg[self.ram[self.pc + 1]]])
-                print(f"MUL")
-                self.pc += 1
+                reg_a = self.reg[self.ram_read(self.pc + 1)]
+                reg_b = self.reg[self.ram_read(self.pc + 2)]
+                self.reg[self.ram[self.pc + 1]] = reg_a * reg_b
+                self.pc += 2
             elif command == self.instruction['HLT']:
                 running = False
             else:
