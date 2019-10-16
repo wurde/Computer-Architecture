@@ -1,6 +1,25 @@
 """CPU functionality."""
 
+#
+# Dependencies
+#
+
 import sys
+
+#
+# Constants
+#
+
+# Stack pointer is register R7
+SP = 7
+# Interrupt status is register R6
+IS = 6
+# Interrupt mask is register R5
+IM = 5
+
+#
+# Class definition
+#
 
 class CPU:
     """Main CPU class."""
@@ -8,18 +27,27 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         # 256 bytes of memory
-        self.ram = [0] * 16
+        self.ram = [0] * 256
         # Create 8 registers, 1 byte each
         self.reg = [0] * 8
 
-        self.pc = 0        
-        self.reg[5] = "IM"
-        self.reg[6] = "IS"
-        self.reg[7] = "SP"
+        self.pc = 0
+        self.reg[IM] = 0
+        self.reg[IS] = 0
+        self.reg[SP] = 0xF4
         self.instruction = {
-            "LDI": 0b10000010,
-            "PRN": 0b01000111,
-            "HLT": 0b00000001
+            "NOP":  0b00000000,
+            "HLT":  0b00000001,
+            "RET":  0b00010001,
+            "PUSH": 0b01000101,
+            "POP":  0b01000110,
+            "CALL": 0b01010000,
+            "PRN":  0b01000111,
+            "INC":  0b01100101,
+            "DEC":  0b01100110,
+            "SUB":  0b10100001,
+            "LDI":  0b10000010,
+            "MUL":  0b10100010,
         }
 
     def load(self, filename):
@@ -52,10 +80,19 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
+        # bitwise-AND the result with 0xFF
+        # to keep values within 0 to 255.
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == "INC":
+            self.reg[reg_a] += 1
+        elif op == "DEC":
+            self.reg[reg_a] -= 1
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -67,8 +104,6 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
-            #self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
             self.ram_read(self.pc + 2)
@@ -86,12 +121,40 @@ class CPU:
         while running:
             command = self.ram_read(self.pc)
 
-            if command == self.instruction['LDI']:
-                self.reg[self.ram[self.pc + 1]] = self.pc + 2
+            if command == self.instruction['NOP']:
+                next
+            elif command == self.instruction['LDI']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.reg[reg_a] = reg_b
                 self.pc += 2
             elif command == self.instruction['PRN']:
-                print(self.ram[self.reg[self.ram[self.pc + 1]]])
+                reg_a = self.ram_read(self.pc + 1)
+                print(self.reg[reg_a])
                 self.pc += 1
+            elif command == self.instruction['MUL']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.alu("MUL", reg_a, reg_b)
+                self.pc += 2
+            elif command == self.instruction['PUSH']:
+                register = self.ram_read(self.pc + 1)
+                val = self.reg[register]
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[SP], val)
+                self.pc += 1
+            elif command == self.instruction['POP']:
+                register = self.ram_read(self.pc + 1)
+                val = self.ram_read(self.reg[SP])
+                self.reg[register] = val
+                self.reg[SP] += 1
+                self.pc += 1
+            elif command == self.instruction['CALL']:
+                # TODO implement CALL
+                raise Exception("CALL not implemented")
+            elif command == self.instruction['RET']:
+                # TODO implement RET
+                raise Exception("RET not implemented")
             elif command == self.instruction['HLT']:
                 running = False
             else:
