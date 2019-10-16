@@ -19,7 +19,9 @@ class CPU:
         self.instruction = {
             "NOP":  0b00000000,
             "HLT":  0b00000001,
+            "RET":  0b00010001,
             "PUSH": 0b01000101,
+            "CALL": 0b01010000,
             "PRN":  0b01000111,
             "INC":  0b01100101,
             "DEC":  0b01100110,
@@ -110,6 +112,10 @@ class CPU:
                 reg_b = self.ram_read(self.pc + 2)
                 self.alu("MUL", reg_a, reg_b)
                 self.pc += 2
+            # TODO implement CALL
+            # elif command == self.instruction['CALL']:
+            # TODO implement RET
+            # elif command == self.instruction['RET']:
             elif command == self.instruction['HLT']:
                 running = False
             else:
