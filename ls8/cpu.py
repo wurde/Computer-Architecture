@@ -12,16 +12,17 @@ class CPU:
         # Create 8 registers, 1 byte each
         self.reg = [0] * 8
 
-        self.pc = 0        
+        self.pc = 0
         self.reg[5] = 0 # IM
         self.reg[6] = 0 # IS
         self.reg[7] = 0 # SP
         self.instruction = {
-            "NOP": 0b00000000,
-            "HLT": 0b00000001,
-            "PRN": 0b01000111,
-            "LDI": 0b10000010,
-            "MUL": 0b10100010,
+            "NOP":  0b00000000,
+            "HLT":  0b00000001,
+            "PUSH": 0b01000101,
+            "PRN":  0b01000111,
+            "LDI":  0b10000010,
+            "MUL":  0b10100010,
         }
 
     def load(self, filename):
