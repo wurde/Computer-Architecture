@@ -133,6 +133,14 @@ class CPU:
                 reg_a = self.ram_read(self.pc + 1)
                 print(self.reg[reg_a])
                 self.pc += 1
+            elif command == self.instruction['INC']:
+                reg_a = self.ram_read(self.pc + 1)
+                self.alu("INC", reg_a, None)
+                self.pc += 1
+            elif command == self.instruction['DEC']:
+                reg_a = self.ram_read(self.pc + 1)
+                self.alu("DEC", reg_a, None)
+                self.pc += 1
             elif command == self.instruction['ADD']:
                 reg_a = self.ram_read(self.pc + 1)
                 reg_b = self.ram_read(self.pc + 2)
