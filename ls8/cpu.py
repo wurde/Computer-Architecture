@@ -12,6 +12,10 @@ import sys
 
 # Stack pointer is register R7
 SP = 7
+# Interrupt status is register R6
+IS = 6
+# Interrupt mask is register R5
+IM = 5
 
 #
 # Class definition
@@ -28,9 +32,9 @@ class CPU:
         self.reg = [0] * 8
 
         self.pc = 0
-        self.reg[5] =  0 # IM
-        self.reg[6] =  0 # IS
-        self.reg[SP] = 0 # SP
+        self.reg[IM] = 0
+        self.reg[IS] = 0
+        self.reg[SP] = 0xF4
         self.instruction = {
             "NOP":  0b00000000,
             "HLT":  0b00000001,
@@ -76,6 +80,8 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
+        # bitwise-AND the result with 0xFF
+        # to keep values within 0 to 255.
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
@@ -114,16 +120,17 @@ class CPU:
 
         while running:
             command = self.ram_read(self.pc)
-            print(f"Command: {command}, {self.pc}, {self.reg}")
 
             if command == self.instruction['NOP']:
                 next
             elif command == self.instruction['LDI']:
-                self.reg[self.ram_read(self.pc + 1)] = self.ram_read(self.pc + 2)
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.reg[reg_a] = reg_b
                 self.pc += 2
             elif command == self.instruction['PRN']:
-                print(f"PRN self.pc+1={self.pc + 1}")
-                print(self.reg[self.ram_read(self.pc + 1)])
+                reg_a = self.ram_read(self.pc + 1)
+                print(self.reg[reg_a])
                 self.pc += 1
             elif command == self.instruction['MUL']:
                 reg_a = self.ram_read(self.pc + 1)
@@ -135,13 +142,13 @@ class CPU:
                 val = self.reg[register]
                 self.reg[SP] -= 1
                 self.ram_write(self.reg[SP], val)
-                self.pc += 2
+                self.pc += 1
             elif command == self.instruction['POP']:
                 register = self.ram_read(self.pc + 1)
                 val = self.ram_read(self.reg[SP])
                 self.reg[register] = val
                 self.reg[SP] += 1
-                self.pc += 2
+                self.pc += 1
             elif command == self.instruction['CALL']:
                 # TODO implement CALL
                 raise Exception("CALL not implemented")
