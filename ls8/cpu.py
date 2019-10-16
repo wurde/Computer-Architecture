@@ -1,6 +1,21 @@
 """CPU functionality."""
 
+#
+# Dependencies
+#
+
 import sys
+
+#
+# Constants
+#
+
+# Stack pointer is register R7
+SP = 7
+
+#
+# Class definition
+#
 
 class CPU:
     """Main CPU class."""
@@ -13,14 +28,15 @@ class CPU:
         self.reg = [0] * 8
 
         self.pc = 0
-        self.reg[5] = 0 # IM
-        self.reg[6] = 0 # IS
-        self.reg[7] = 0 # SP
+        self.reg[5] =  0 # IM
+        self.reg[6] =  0 # IS
+        self.reg[SP] = 0 # SP
         self.instruction = {
             "NOP":  0b00000000,
             "HLT":  0b00000001,
             "RET":  0b00010001,
             "PUSH": 0b01000101,
+            "POP":  0b01000110,
             "CALL": 0b01010000,
             "PRN":  0b01000111,
             "INC":  0b01100101,
@@ -98,6 +114,7 @@ class CPU:
 
         while running:
             command = self.ram_read(self.pc)
+            print(f"Command: {command}, {self.pc}, {self.reg}")
 
             if command == self.instruction['NOP']:
                 next
@@ -105,6 +122,7 @@ class CPU:
                 self.reg[self.ram_read(self.pc + 1)] = self.ram_read(self.pc + 2)
                 self.pc += 2
             elif command == self.instruction['PRN']:
+                print(f"PRN self.pc+1={self.pc + 1}")
                 print(self.reg[self.ram_read(self.pc + 1)])
                 self.pc += 1
             elif command == self.instruction['MUL']:
@@ -112,10 +130,24 @@ class CPU:
                 reg_b = self.ram_read(self.pc + 2)
                 self.alu("MUL", reg_a, reg_b)
                 self.pc += 2
-            # TODO implement CALL
-            # elif command == self.instruction['CALL']:
-            # TODO implement RET
-            # elif command == self.instruction['RET']:
+            elif command == self.instruction['PUSH']:
+                register = self.ram_read(self.pc + 1)
+                val = self.reg[register]
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[SP], val)
+                self.pc += 2
+            elif command == self.instruction['POP']:
+                register = self.ram_read(self.pc + 1)
+                val = self.ram_read(self.reg[SP])
+                self.reg[register] = val
+                self.reg[SP] += 1
+                self.pc += 2
+            elif command == self.instruction['CALL']:
+                # TODO implement CALL
+                raise Exception("CALL not implemented")
+            elif command == self.instruction['RET']:
+                # TODO implement RET
+                raise Exception("RET not implemented")
             elif command == self.instruction['HLT']:
                 running = False
             else:
