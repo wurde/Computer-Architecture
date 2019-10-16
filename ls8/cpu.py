@@ -20,9 +20,10 @@ class CPU:
             "NOP":  0b00000000,
             "HLT":  0b00000001,
             "PUSH": 0b01000101,
+            "PRN":  0b01000111,
             "INC":  0b01100101,
             "DEC":  0b01100110,
-            "PRN":  0b01000111,
+            "SUB":  0b10100001,
             "LDI":  0b10000010,
             "MUL":  0b10100010,
         }
@@ -60,6 +61,8 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "INC":
