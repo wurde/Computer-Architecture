@@ -174,8 +174,9 @@ class CPU:
                 self.ram_write(self.reg[SP], self.pc + 2)
                 self.pc = reg_a
             elif command == self.instruction['RET']:
-                # TODO implement RET
-                raise Exception("RET not implemented")
+                register = self.ram_read(self.reg[SP])
+                self.reg[SP] += 1
+                self.pc = register - 1
             elif command == self.instruction['HLT']:
                 running = False
             else:
