@@ -45,6 +45,7 @@ class CPU:
             "PRN":  0b01000111,
             "INC":  0b01100101,
             "DEC":  0b01100110,
+            "ST":   0b10000100,
             "ADD":  0b10100000,
             "SUB":  0b10100001,
             "LDI":  0b10000010,
@@ -177,6 +178,11 @@ class CPU:
                 register = self.ram_read(self.reg[SP])
                 self.reg[SP] += 1
                 self.pc = register - 1
+            elif command == self.instruction['ST']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.reg[reg_a] = reg_b
+                self.pc += 2
             elif command == self.instruction['HLT']:
                 running = False
             else:
