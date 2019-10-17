@@ -39,12 +39,18 @@ class CPU:
             "NOP":  0b00000000,
             "HLT":  0b00000001,
             "RET":  0b00010001,
+            "IRET": 0b00010011,
             "PUSH": 0b01000101,
             "POP":  0b01000110,
+            "PRA":  0b01001000,
             "CALL": 0b01010000,
+            "JMP":  0b01010100,
             "PRN":  0b01000111,
             "INC":  0b01100101,
             "DEC":  0b01100110,
+            "LD":   0b10000011,
+            "ST":   0b10000100,
+            "ADD":  0b10100000,
             "SUB":  0b10100001,
             "LDI":  0b10000010,
             "MUL":  0b10100010,
@@ -132,6 +138,28 @@ class CPU:
                 reg_a = self.ram_read(self.pc + 1)
                 print(self.reg[reg_a])
                 self.pc += 1
+            elif command == self.instruction['PRA']:
+                reg_a = self.ram_read(self.pc + 1)
+                print(chr(self.reg[reg_a]))
+                self.pc += 1
+            elif command == self.instruction['INC']:
+                reg_a = self.ram_read(self.pc + 1)
+                self.alu("INC", reg_a, None)
+                self.pc += 1
+            elif command == self.instruction['DEC']:
+                reg_a = self.ram_read(self.pc + 1)
+                self.alu("DEC", reg_a, None)
+                self.pc += 1
+            elif command == self.instruction['ADD']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.alu("ADD", reg_a, reg_b)
+                self.pc += 2
+            elif command == self.instruction['SUB']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.alu("SUB", reg_a, reg_b)
+                self.pc += 2
             elif command == self.instruction['MUL']:
                 reg_a = self.ram_read(self.pc + 1)
                 reg_b = self.ram_read(self.pc + 2)
@@ -150,11 +178,33 @@ class CPU:
                 self.reg[SP] += 1
                 self.pc += 1
             elif command == self.instruction['CALL']:
-                # TODO implement CALL
-                raise Exception("CALL not implemented")
+                reg_a = self.reg[self.ram_read(self.pc + 1)]
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[SP], self.pc + 2)
+                self.pc = reg_a
             elif command == self.instruction['RET']:
-                # TODO implement RET
-                raise Exception("RET not implemented")
+                register = self.ram_read(self.reg[SP])
+                self.reg[SP] += 1
+                self.pc = register - 1
+            elif command == self.instruction['IRET']:
+                # TODO 1. Registers R6-R0 are popped off the stack in that order.
+                # TODO 2. The `FL` register is popped off the stack.
+                # TODO 3. The return address is popped off the stack and stored in `PC`.
+                # TODO 4. Interrupts are re-enabled
+                raise Exception("Unimplemented operation IRET")
+            elif command == self.instruction['LD']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.ram_read(self.pc + 2)
+                self.reg[reg_a] = reg_b
+                self.pc += 2
+            elif command == self.instruction['ST']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.reg[self.ram_read(self.pc + 2)]
+                self.reg[reg_a] = reg_b
+                self.pc += 2
+            elif command == self.instruction['JMP']:
+                reg_a = self.reg[self.ram_read(self.pc + 1)]
+                self.pc = reg_a
             elif command == self.instruction['HLT']:
                 running = False
             else:
