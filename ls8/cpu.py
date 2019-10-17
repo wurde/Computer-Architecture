@@ -169,8 +169,10 @@ class CPU:
                 self.reg[SP] += 1
                 self.pc += 1
             elif command == self.instruction['CALL']:
-                # TODO implement CALL
-                raise Exception("CALL not implemented")
+                reg_a = self.reg[self.ram_read(self.pc + 1)]
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[SP], self.pc + 2)
+                self.pc = reg_a
             elif command == self.instruction['RET']:
                 # TODO implement RET
                 raise Exception("RET not implemented")
