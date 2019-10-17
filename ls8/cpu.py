@@ -39,13 +39,16 @@ class CPU:
             "NOP":  0b00000000,
             "HLT":  0b00000001,
             "RET":  0b00010001,
+            "IRET": 0b00010011,
             "PUSH": 0b01000101,
             "POP":  0b01000110,
+            "PRA":  0b01001000,
             "CALL": 0b01010000,
             "JMP":  0b01010100,
             "PRN":  0b01000111,
             "INC":  0b01100101,
             "DEC":  0b01100110,
+            "LD":   0b10000011,
             "ST":   0b10000100,
             "ADD":  0b10100000,
             "SUB":  0b10100001,
@@ -135,6 +138,10 @@ class CPU:
                 reg_a = self.ram_read(self.pc + 1)
                 print(self.reg[reg_a])
                 self.pc += 1
+            elif command == self.instruction['PRA']:
+                reg_a = self.ram_read(self.pc + 1)
+                print(chr(self.reg[reg_a]))
+                self.pc += 1
             elif command == self.instruction['INC']:
                 reg_a = self.ram_read(self.pc + 1)
                 self.alu("INC", reg_a, None)
@@ -179,9 +186,20 @@ class CPU:
                 register = self.ram_read(self.reg[SP])
                 self.reg[SP] += 1
                 self.pc = register - 1
-            elif command == self.instruction['ST']:
+            elif command == self.instruction['IRET']:
+                # TODO 1. Registers R6-R0 are popped off the stack in that order.
+                # TODO 2. The `FL` register is popped off the stack.
+                # TODO 3. The return address is popped off the stack and stored in `PC`.
+                # TODO 4. Interrupts are re-enabled
+                raise Exception("Unimplemented operation IRET")
+            elif command == self.instruction['LD']:
                 reg_a = self.ram_read(self.pc + 1)
                 reg_b = self.ram_read(self.pc + 2)
+                self.reg[reg_a] = reg_b
+                self.pc += 2
+            elif command == self.instruction['ST']:
+                reg_a = self.ram_read(self.pc + 1)
+                reg_b = self.reg[self.ram_read(self.pc + 2)]
                 self.reg[reg_a] = reg_b
                 self.pc += 2
             elif command == self.instruction['JMP']:
